@@ -122,14 +122,21 @@ object FuncionesAO extends App {
    */
   def filterL[A](lst:List[A])(p:A=>Boolean):List[A] = foldLeft(lst,Nil:List[A])((y,x) => if(p(x)) Const(x,y) else y)
 
-  //println(filter(List(1,2,1,4,3,2,4,5,6,5))(_ % 2 == 0))
+  println(filter(List(1,2,1,4,3,2,4,5,6,5))(_ % 2 == 0))
 
 /*
   Ejercicio 23. Implemente la función unzipL esta lista separa una lista de tuplas
   en dos listas distintas. Compute la función unzip utilizando foldLeft.
  */
-  def unzipL[A,B](lst:List[(A,B)]):(List[A],List[B]) = foldLeft(lst,(Nil:List[A],Nil:List[B]))((y,x) => (Const(x._1,y._1),Const(x._2,y._2)))
 
-  println(unzipL(List((1,"a"),(2,"b"),(3,"c"))))
+  def unzipL[A,B](lst:List[(A,B)]):(List[A],List[B]) = {
+    val tup = foldLeft(lst,(Nil:List[A],Nil:List[B]))((y,x) => (Const(x._1,y._1),Const(x._2,y._2)))
+    val l1 = tup._1
+    val l2 = tup._2
+    (foldLeft(l1,Nil:List[A])((x,y)=>Const(y,x)),foldLeft(l2,Nil:List[B])((x,y)=>Const(y,x)))
+  }
+
+  //println(unzipL(List((1,"a"),(2,"b"),(3,"c"))))
+
 
 }
