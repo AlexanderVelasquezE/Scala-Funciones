@@ -277,8 +277,16 @@ divide la primera lista en n elementos y los restantes quedan en la segunda list
 
 //  println(sumarUnoL(List(1,2,3,4,5)))
 
-  def map[A,B](lst:List[A])(f:A=>B):List[B] = foldRight(lst,Nil:List[B])((x,y)=> Const(f(x),y))
+  def mapGen[A,B](lst:List[A])(f:A=>B):List[B] = lst match {
+    case Nil => Nil
+    case Const(h,t) => Const(f(h),mapGen(t)(f))
+  }
 
+  def map[A,B](lst:List[A])(f:A=>B):List[B] = foldRight(lst,Nil:List[B])((x,y)=> Const(f(x),y))
+  def mapL[A,B](lst:List[A])(f:A=>B):List[B] = foldLeft(lst,Nil:List[B])((y,x)=> Const(f(x),y))
+
+  println(map(List(1,2,3,4,5))(_*2))
+  println(mapL(List(1,2,3,4,5))(_*2))
 
 
 
