@@ -52,7 +52,7 @@ object FuncionesAO extends App {
    */
 
   def takeWhile[A](lst: List[A])(p:A=>Boolean):List[A] = lst match {
-    case Const(h,t) => if(p(h)) Const(h,takeWhile(t)(p)) else return Nil
+    case Const(h,t) => if(p(h)) Const(h,takeWhile(t)(p)) else Nil
     case Nil => Nil
   }
   //println(takeWhile(List(1,2,3,4,5))(_ < 4))
@@ -113,16 +113,24 @@ object FuncionesAO extends App {
   /*
   Ejercicio 21. La función takeWhileL utilizando foldLeft.
    */
-  def takeWhileL[A](lst: List[A])(p:A=>Boolean):List[A] = foldLeft(lst,Nil:List[A])((y,x) => if(p(x)) Const(x,y) else y)
+  /*
+    @tailrec
+    def foldLeft[A,B](as: List[A], z: B)(f:(B,A)=>B):B = as match {
+      case Const(h,t) => foldLeft(t,f(z,h))(f)
+      case Nil => z
+  }
+   */
+  def takeWhileL[A](lst: List[A])(p:A=>Boolean):List[A] = foldLeft(List.reverse(lst),Nil:List[A])((y,x) => if(p(x)) Const(x,y) else Nil)
 
-  //println(takeWhile(List(1,2,3,4,5))(_ < 4))
+  println(takeWhileL(List(1,2,3,4,5,-1,-2,0))(_ < 4))
+  println(takeWhileL(List("abc","abc","a","","aaaaa"))(_.length <= 3))
 
   /*
   Ejercicio 22. Compute la función filter utilizando foldLeft
    */
   def filterL[A](lst:List[A])(p:A=>Boolean):List[A] = foldLeft(lst,Nil:List[A])((y,x) => if(p(x)) Const(x,y) else y)
 
-  println(filter(List(1,2,1,4,3,2,4,5,6,5))(_ % 2 == 0))
+  //println(filter(List(1,2,1,4,3,2,4,5,6,5))(_ % 2 == 0))
 
 /*
   Ejercicio 23. Implemente la función unzipL esta lista separa una lista de tuplas
@@ -138,5 +146,8 @@ object FuncionesAO extends App {
 
   //println(unzipL(List((1,"a"),(2,"b"),(3,"c"))))
 
+  /*
+  Ejercicio extra DropWhileRight  dropwhile con foldright
+   */
 
 }
