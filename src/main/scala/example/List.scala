@@ -285,9 +285,16 @@ divide la primera lista en n elementos y los restantes quedan en la segunda list
   def map[A,B](lst:List[A])(f:A=>B):List[B] = foldRight(lst,Nil:List[B])((x,y)=> Const(f(x),y))
   def mapL[A,B](lst:List[A])(f:A=>B):List[B] = foldLeft(lst,Nil:List[B])((y,x)=> Const(f(x),y))
 
-  println(map(List(1,2,3,4,5))(_*2))
-  println(mapL(List(1,2,3,4,5))(_*2))
+  //println(map(List(1,2,3,4,5))(_*2))
+  //println(mapL(List(1,2,3,4,5))(_*2))
 
-
+  def dropWhileR[A](list: List[A])(p: A => Boolean): List[A] = {
+    def f(a: A, b: (Boolean, List[A])): (Boolean, List[A]) = b match {
+      case (true, Const(h, t)) => if (p(h)) (true, t) else (false, Const(h, t))
+      case (true, Nil) => (false, Nil)
+      case (false, _) => b
+    }
+    foldRight(list, (true, list))(f)._2
+  }
 
 }
