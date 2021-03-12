@@ -2,15 +2,6 @@ package listas
 
 object Listas extends App{
 
-  def longitud[A](lst:List[A]):Int = lst match {
-    case _::xs => 1 + longitud(xs)
-    case Nil => 1
-  }
-  //val lst = 1 :: 2 :: 3 :: 4 :: 5 :: 6:: Nil
-
-  def dropAt[A](lst:List[A],pos:Int):List[A] = lst.splitAt(pos) match {
-    case (h, t) => h ::: t.tail
-  }
 
   /*
   Ejercicio 1. La función subs me permite obtener todos los subconjuntos que

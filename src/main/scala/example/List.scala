@@ -161,7 +161,7 @@ divide la primera lista en n elementos y los restantes quedan en la segunda list
 
   def split[A](pos:Int,lst:List[A]):(List[A],List[A]) = {
     @tailrec
-    def splitAux[A](pos:Int,lst:List[A],lst2:List[A]):(List[A],List[A]) = (pos,lst) match {
+    def splitAux(pos:Int,lst:List[A],lst2:List[A]):(List[A],List[A]) = (pos,lst) match {
       case (a,Nil) => (lst2,Nil)
       case (0,lst) => (lst2,lst)
       case (a,Const(h,t)) => splitAux(a-1,t,addEnd(h,lst2))
@@ -195,7 +195,7 @@ divide la primera lista en n elementos y los restantes quedan en la segunda list
 
   def unzip[A,B](lst:List[(A,B)]):(List[A],List[B]) = {
     @tailrec
-    def unzipRec[A,B](lst:List[(A,B)],l1:List[A],l2:List[B]):(List[A],List[B]) = lst match {
+    def unzipRec(lst:List[(A,B)],l1:List[A],l2:List[B]):(List[A],List[B]) = lst match {
       case Nil => (l1,l2)
       case Const(h,t) => unzipRec(t,addEnd(h._1,l1),addEnd(h._2,l2))
     }

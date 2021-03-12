@@ -42,17 +42,10 @@ object ProblemasListasFor extends App{
 
    */
   //Precondicion la lista debe tener al menos 2 elementos
-  def myButLast[A](lst:List[A]):A = {
-    val a = for {
-      x <- lst
-      if x != lst.last
-    } yield x
-    val b = for {
-      x <- a
-      if x == a.last
-    } yield x
-    b.head
-  }
+  def myButLast[A](lst:List[A]):A =  (for {
+    x <- lst
+  } yield (t:(A,A)) => (t._2,x)).foldLeft((lst.head,lst.head))((e,f) => f(e))._1
+
   //println(myButLast(List(1,2,3,4)))
   //println(myButLast(List('x','y','z')))
 
@@ -117,7 +110,7 @@ object ProblemasListasFor extends App{
     x <- lst
   } yield ((a:List[A]) => x :: a)).foldLeft(List():List[A])((e,f) => f(e))
 
-  println(myReverse(List(1,2,3,4,5)))
+  //println(myReverse(List(1,2,3,4,5)))
 
   /*
   Problem 6
@@ -132,13 +125,17 @@ object ProblemasListasFor extends App{
   λ> isPalindrome [1,2,4,8,16,8,4,2,1]
   True
    */
-  def isPalindrome[A](lst:List[A]):Boolean = myReverse(lst)==lst
 
+  /*def isPalindrome[A](lst:List[A]) = (for {
+    x <- lst
+  } yield (t:(List[A],Boolean)) => t._2 match {
+    case false => (t._1.tail,false)
+    case true => if(t._1.head == x) (t._1.tail,true) else (t._1.tail,false)
+  }).foldLeft((myReverse(lst),true))((e,f) => f(e))._2*/
   //println(isPalindrome(List(1,2,2,1)))
   //println(isPalindrome(List(1,2,3,4)))
   //println(isPalindrome(List(1,2,3,2,1)))
   //println(isPalindrome(List(1,2,3,4,5)))
-
   /*
   Problem 7
   (**) Flatten a nested list structure.
@@ -156,14 +153,6 @@ object ProblemasListasFor extends App{
 /*
   val nl1 = Lista(List( Elemento(1), Lista(List(Elemento(2))), Elemento(3) ))
   println(nl1)
-
-  def myFlatten[A](lst:Lista[NestedLista[A]]):List[A] = {
-    def myFlattenR[A](lst:Lista[NestedLista[A]], acc: List[A]): List[A] = lst match {
-      //case Nil => acc
-      //case Elemento(n) :: xs => myFlattenR(xs , n :: acc)
-      //case Lista(x) :: xs => myFlattenR(Lista(x),acc) :: myFlattenR(xs,acc)
-    }
-    myFlattenR(lst,Nil)
   }*/
 
   /*
@@ -182,22 +171,12 @@ object ProblemasListasFor extends App{
   "abcade"
    */
 
-  def compress[A](lst:List[A]):List[A] = {
-    @tailrec
-    def compressR(lst:List[A],acc:List[A]):List[A] = lst match {
-      case x :: y :: xs  => if(x!=y) compressR(y::xs,acc ::: List(x)) else compressR(y::xs, acc)
-      case x :: Nil => acc ::: List(x)
-      case Nil => acc
-    }
-    compressR(lst,Nil)
-  }
-  def compress2[A](lst:List[A]):List[A] = lst match {
-    case Nil => Nil
-    case head::Nil => List(head)
-    case head::tail => if (head == tail.head) compress2(tail) else head::compress2(tail)
-  }
-//  println(compress(List(1,1,1,2)))
-//  println(compress(List(1,1,1,2,2,2,3,3)))
+  def compress[A](lst:List[A]):List[A] = (for {
+    x <- lst
+  } yield (a:List[A]) => if(a.contains(x)) a else a :+ x).foldLeft(List(lst.head))((e,f) => f(e))
+
+  //println(compress(List(1,1,1,2)))
+  //println(compress(List(1,1,1,2,2,2,3,3)))
   //println(compress(List(1,1,1,2,3,4,4,4,4,5,5)))
 
   /*
@@ -214,15 +193,7 @@ object ProblemasListasFor extends App{
                'a', 'd', 'e', 'e', 'e', 'e']
   ["aaaa","b","cc","aa","d","eeee"]
    */
-  def pack[A](lst:List[A]):List[List[A]] = {
-    @tailrec
-    def packR(lst: List[A],subAcc:List[A],acc:List[List[A]]):List[ List[A] ] = lst match {
-      case Nil => acc
-      case x :: Nil => packR(Nil,Nil,acc ::: List(x::subAcc))
-      case x :: xs => if (x == xs.head) packR(xs,x::subAcc,acc) else packR(xs,Nil,acc ::: List(x::subAcc))
-    }
-    packR(lst,Nil,List())
-  }
+
   //println(pack(List(1,1,1,1,2,3,3,4,4,4,5,5)))
   //println(pack(List(1,2)))
 
@@ -242,15 +213,7 @@ object ProblemasListasFor extends App{
   [(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]
    */
 
-  def encode[A](lst:List[A]):List[(Int,A) ] = {
-    @tailrec
-    def encodeR(lst: List[A],cont:Int,acc:List[(Int,A)]):List[ (Int,A) ] = lst match {
-      case Nil => acc
-      case x :: Nil => encodeR(Nil,0,acc ::: List((cont+1,x)))
-      case x :: xs => if (x == xs.head) encodeR(xs,cont+1,acc) else encodeR(xs,0,acc ::: List((cont+1,x)))
-    }
-    encodeR(lst,0,List())
-  }
+
 
 //  println(encode(List(1,1,1,1,2,3,3,4,4,4,5,5)))
 //  println(encode(List("a","b")))
@@ -275,18 +238,8 @@ object ProblemasListasFor extends App{
   case class Multiple[A](veces:Int, element: A) extends Valores[A]
   case class Unico[A](element: A) extends Valores[A]
 
-  def encodeModified[A](lst:List[A]):List[Valores[A]] = {
-    @tailrec
-    def encodeModifiedR(lst: List[A],cont:Int,acc:List[Valores[A]]):List[Valores[A]] = lst match {
-      case Nil => acc
-      case x :: Nil => if (cont > 0 ) encodeModifiedR(Nil,0,acc ::: List(Multiple(cont+1,x)))
-                          else encodeModifiedR(Nil,0,acc ::: List(Unico(x)))
-      case x :: xs => if (x == xs.head) encodeModifiedR(xs,cont+1,acc) else
-        if (cont > 0 ) encodeModifiedR(xs,0,acc ::: List(Multiple(cont+1,x)))
-          else encodeModifiedR(xs,0,acc ::: List(Unico(x)))
-    }
-    encodeModifiedR(lst,0,List())
-  }
+
+
 
   //println(encodeModified(List(1,1,1,2,3,3,4)))
   //println(encodeModified(List(1,1,1,2,3,3,4,5,5)))
@@ -304,18 +257,8 @@ object ProblemasListasFor extends App{
           Multiple 2 'a',Single 'd',Multiple 4 'e']
   "aaaabccaadeeee"
    */
-  def decodeModified[A](lst:List[Valores[A]]):List[A] = {
-    def valToList(lst:Valores[A]):List[A] = lst match {
-      case Unico(x) => List(x)
-      case Multiple(n,ele) => List.fill(n)(ele)
-    }
-    @tailrec
-    def decodeModifiedR(lst: List[Valores[A]],acc:List[A]):List[A] = lst match {
-      case Nil => acc
-      case x :: xs => decodeModifiedR(xs, acc ::: valToList(x) )
-    }
-    decodeModifiedR(lst,List())
-  }
+
+
 
   //println(decodeModified(List(Multiple(3,1), Unico(2), Multiple(2,3), Unico(4) )))
   //println(decodeModified(List(Multiple(3,1), Unico(2), Multiple(2,3), Unico(4), Multiple(2,5))))
@@ -363,10 +306,8 @@ object ProblemasListasFor extends App{
   λ> dupli [1, 2, 3]
   [1,1,2,2,3,3]
    */
-  def dupli[A](lst:List[A]):List[A] = lst match {
-    case Nil => Nil
-    case x :: xs => x :: x :: dupli(xs)
-  }
+
+
   //println(dupli(List(1,2,3)))
   //println(dupli(List("a","b","c","c","d")))
 
@@ -383,17 +324,8 @@ object ProblemasListasFor extends App{
   λ> repli "abc" 3
   "aaabbbccc"
    */
-  def repli[A](lst:List[A],cant:Int):List[A] = {
-    def repliAux(ele:A, cant:Int):List[A] = cant match {
-      case 0 => Nil
-      case n => ele :: repliAux(ele, n-1)
-    }
-    def repliR(lst:List[A],cant:Int):List[A] = lst match {
-      case Nil => Nil
-      case x :: xs => repliAux(x,cant) ::: repliR(xs,cant)
-    }
-    repliR(lst,cant)
-  }
+
+
 
   //println(repli(List("a","b","c"),3))
   //println(repli(List("a","b","c"),5))
@@ -412,14 +344,8 @@ object ProblemasListasFor extends App{
   λ> dropEvery "abcdefghik" 3
   "abdeghk"
    */
-  def drop[A](lst:List[A],pos:Int):List[A] = {
-    def dropR(lst:List[A],act:Int):List[A] = (lst,act) match {
-      case (Nil,_) => Nil
-      case (_::xs,1) => dropR(xs,pos)
-      case (x::xs,n) => x :: dropR(xs,n-1)
-    }
-    dropR(lst,pos)
-  }
+
+
   //println(drop(List(1,2,3,4,5,6,7,8,9),3))
   //println(drop(List("a","b","c","d","e","f","g","h","i","k"),3))
 
@@ -439,15 +365,8 @@ object ProblemasListasFor extends App{
   ("abc", "defghik")
    */
 
-  def split[A](lst:List[A],pos:Int):List[List[A]] = {
-    @tailrec
-    def splitAux(pos:Int,lst:List[A],lst2:List[A]):List[List[A]] = (pos,lst) match {
-      case (_,Nil) => List(lst2,Nil)
-      case (0,lst) => List(lst2,lst)
-      case (a,x :: xs) => splitAux(a-1,xs, lst2 ::: List(x))
-    }
-    splitAux(pos,lst,Nil)
-  }
+
+
 
   //println(split(List("a","b","c","d","e","f","g","h","i","k"),3))
   //println(split(List("a","b","c","d","e","f","g","h","i","k"),23))
@@ -469,14 +388,8 @@ object ProblemasListasFor extends App{
   λ> slice ['a','b','c','d','e','f','g','h','i','k'] 3 7
   "cdefg"
    */
-  def slice[A](lst:List[A],i:Int,k:Int):List[A] = {
-    def sliceR(lst:List[A],pos:Int):List[A] = lst match {
-      case Nil => Nil
-      case _::_ if pos > k => Nil
-      case x::xs => if(pos < i || pos > k) sliceR(xs,pos+1) else x :: sliceR(xs,pos+1)
-    }
-    sliceR(lst,1)
-  }
+
+
   //println(slice(List("a","b","c","d","e","f","g","h","i","k"),3,7))
   //println(slice(List("a","b","c","d","e","f","g","h","i","k"),0,18))
   //println(slice(List("a","b","c","d","e","f","g","h","i","k"),10,11))
@@ -502,24 +415,8 @@ object ProblemasListasFor extends App{
   λ> rotate ['a','b','c','d','e','f','g','h'] (-2)
   "ghabcdef"
    */
-  def rotate[A](lst:List[A],pos:Int):List[A] = {
-    if (pos >= 0) {
-      val tupleL = split(lst,pos)
-      tupleL(1) ::: tupleL.head
-    }
-    else {
-      val tupleL = split(lst,lst.length + pos)
-      tupleL(1) ::: tupleL.head
-    }
-  }
-  def rotate2[A](lst:List[A],pos:Int):List[A] = {
-    @tailrec
-    def rotateR(lst:List[A],lst2:List[A],pos:Int):List[A] = pos match {
-      case 0 => lst ::: lst2
-      case n => rotateR(lst.tail,lst2 ::: List(lst.head) ,n-1)
-    }
-    if (pos<0) rotateR(lst,Nil,lst.length + pos) else  rotateR(lst,Nil,pos)
-  }
+
+
 
   //println(rotate(List("a","b","c","d","e","f","g","h"),3))
   //println(rotate(List("a","b","c","d","e","f","g","h"),-2))
@@ -536,10 +433,8 @@ object ProblemasListasFor extends App{
   (A C D)
 
    */
-  def removeAt[A](lst:List[A],pos:Int):List[A] = lst match {
-    case Nil => Nil
-    case x :: xs => if(pos==1) xs else x::removeAt(xs,pos-1)
-  }
+
+
   //println(removeAt(List("a","b","c","d"),2))
   //println(removeAt(List("a","b","c","d"),0))
   //println(removeAt(List("a","b","c","d"),10))
@@ -557,10 +452,8 @@ object ProblemasListasFor extends App{
   λ> insertAt 'X' "abcd" 2
   "aXbcd"
    */
-  def insertAt[A](ele:A,lst:List[A],pos:Int):List[A] = lst match {
-    case Nil => if(pos>=1) ele :: Nil else Nil
-    case x :: xs => if(pos==1) ele::x::xs else x::insertAt(ele,xs,pos-1)
-  }
+
+
 
   //println(insertAt("alfa",List("a","b","c","d"),2))
   //println(insertAt("alfa",List("a","b","c","d"),6))
@@ -581,9 +474,8 @@ object ProblemasListasFor extends App{
   λ> range 4 9
   [4,5,6,7,8,9]
    */
-  def range(i:Int,k:Int):List[Int] = i match {
-    case n => if(n == k) List(k) else n::range(i+1,k)
-  }
+
+
   //println(range(4,9))
 
   /*
@@ -623,14 +515,8 @@ object ProblemasListasFor extends App{
   λ> diff_select 6 49
   [23,1,17,33,21,37]
    */
-  def rndSelect(i:Int,k:Int):List[Int] = {
-    val rnd = new scala.util.Random
-    def rndSelectR(i:Int,k:Int):List[Int] = i match {
-      case 0 => Nil
-      case n =>rnd.between(0,k) :: rndSelectR(n-1,k)
-    }
-    rndSelectR(i,k)
-  }
+
+
   //println(rndSelect(6,49))
 
   /*
